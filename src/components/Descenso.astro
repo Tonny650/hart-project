@@ -1,0 +1,292 @@
+---
+// El descenso: secuencia de frames ligada al scroll. Avanza al bajar y retrocede al subir.
+import { href } from '../lib/paths';
+import { mxn, precioDesde } from '../config/site';
+
+const base = href('/descenso');
+---
+
+<section class="descenso" data-descenso data-base={base} data-nav-dark aria-labelledby="descenso-titulo">
+  <div class="sticky">
+    <picture class="poster">
+      <source media="(max-aspect-ratio: 1/1)" srcset={`${base}/mobile/0001.webp`} />
+      <img src={`${base}/desktop/0001.webp`} alt="" width="1600" height="900" fetchpriority="high" decoding="async" />
+    </picture>
+    <canvas aria-hidden="true"></canvas>
+
+    <div class="copy">
+      <div class="line" data-from="0" data-to="0.2">
+        <h1 id="descenso-titulo">Diseños originales.<br />Impresos en México.</h1>
+      </div>
+      <div class="line top" data-from="0.3" data-to="0.52">
+        <p class="t-section">100% algodón.</p>
+        <p class="t-sub t-secondary">Cada prenda se imprime en Guadalajara, una por una.</p>
+      </div>
+      <div class="line top" data-from="0.6" data-to="0.8">
+        <p class="t-section">Cada detalle, a la vista.</p>
+      </div>
+      <div class="line" data-from="0.88" data-to="1.01">
+        <p class="t-sub">Playeras, oversize y sudaderas desde {mxn(precioDesde)}.</p>
+        <div class="actions">
+          <a class="btn" href={href('/catalogo/')}>Ver catálogo</a>
+          <a class="link" href={href('/personalizados/')}>Diseño personalizado ›</a>
+        </div>
+      </div>
+    </div>
+
+    <p class="hint t-small" aria-hidden="true">Desliza</p>
+  </div>
+</section>
+
+<script>
+  type Manifest = { count: number; width: number; height: number };
+
+  function setupDescenso() {
+    const section = document.querySelector<HTMLElement>('[data-descenso]');
+    if (!section || section.dataset.ready) return;
+    section.dataset.ready = '1';
+
+    const canvas = section.querySelector('canvas')!;
+    const ctx = canvas.getContext('2d', { alpha: false })!;
+    const lines = [...section.querySelectorAll<HTMLElement>('.line')];
+    const hint = section.querySelector<HTMLElement>('.hint')!;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+    const portrait = matchMedia('(max-aspect-ratio: 1/1)');
+
+    let frames: (ImageBitmap | HTMLImageElement | undefined)[] = [];
+    let count = 0;
+    let target = 0;
+    let current = 0;
+    let drawn = -1;
+    let raf = 0;
+    let running = false;
+    let loadId = 0;
+
+    const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+
+    function progress() {
+      const r = section!.getBoundingClientRect();
+      const range = r.height - innerHeight;
+      return range > 0 ? clamp(-r.top / range) : 0;
+    }
+
+    function resize() {
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      canvas.width = Math.round(canvas.clientWidth * dpr);
+      canvas.height = Math.round(canvas.clientHeight * dpr);
+      drawn = -1;
+    }
+
+    // Frame cargado más cercano al índice pedido.
+    function nearest(i: number) {
+      for (let d = 0; d < count; d++) {
+        if (frames[i - d]) return frames[i - d];
+        if (frames[i + d]) return frames[i + d];
+      }
+      return undefined;
+    }
+
+    function draw(i: number) {
+      const img = nearest(i);
+      if (!img) return;
+      const cw = canvas.width, ch = canvas.height;
+      const iw = img.width, ih = img.height;
+      const s = Math.max(cw / iw, ch / ih);
+      const w = iw * s, h = ih * s;
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, cw, ch);
+      ctx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
+      if (!section!.classList.contains('live')) section!.classList.add('live');
+    }
+
+    function updateCopy(p: number) {
+      const fade = 0.06;
+      for (const el of lines) {
+        const from = +el.dataset.from!, to = +el.dataset.to!;
+        const inO = from === 0 ? 1 : clamp((p - from) / fade);
+        const outO = to > 1 ? 1 : clamp((to - p) / fade);
+        const o = Math.min(inO, outO);
+        el.style.opacity = String(o);
+        el.style.visibility = o > 0.01 ? 'visible' : 'hidden';
+        el.style.transform = reduced.matches ? '' : `translateY(${((1 - o) * 12).toFixed(1)}px)`;
+      }
+      hint.style.opacity = String(clamp(1 - p / 0.05));
+    }
+
+    function tick() {
+      const p = progress();
+      target = p * (count - 1);
+      current += (target - current) * 0.18;
+      if (Math.abs(target - current) < 0.02) current = target;
+      const i = Math.round(current);
+      if (i !== drawn) {
+        draw(i);
+        if (nearest(i)) drawn = i;
+      }
+      // El texto sigue el scroll real; solo el video se suaviza.
+      updateCopy(p);
+      raf = running ? requestAnimationFrame(tick) : 0;
+    }
+
+    function start() {
+      if (running) return;
+      running = true;
+      raf = requestAnimationFrame(tick);
+    }
+    function stop() {
+      running = false;
+      cancelAnimationFrame(raf);
+    }
+
+    async function loadFrame(url: string) {
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = url;
+      await img.decode();
+      return 'createImageBitmap' in window ? createImageBitmap(img) : img;
+    }
+
+    // Carga progresiva: primero cada 8º frame, luego se rellenan los huecos.
+    async function load() {
+      const id = ++loadId;
+      const set = portrait.matches ? 'mobile' : 'desktop';
+      const base = `${section!.dataset.base}/${set}`;
+      const manifest: Manifest = await fetch(`${base}/manifest.json`).then((r) => r.json());
+      if (id !== loadId) return;
+      count = manifest.count;
+      frames = new Array(count);
+      drawn = -1;
+      const order: number[] = [];
+      for (const step of [8, 4, 2, 1]) {
+        for (let i = 0; i < count; i += step) if (!order.includes(i)) order.push(i);
+      }
+      if (!order.includes(count - 1)) order.splice(1, 0, count - 1);
+      const queue = [...order];
+      const worker = async () => {
+        while (queue.length && id === loadId) {
+          const i = queue.shift()!;
+          const name = String(i + 1).padStart(4, '0');
+          try {
+            frames[i] = await loadFrame(`${base}/${name}.webp`);
+          } catch {}
+          if (id === loadId && Math.abs(i - current) < 8) drawn = -1;
+        }
+      };
+      await Promise.all([worker(), worker(), worker(), worker()]);
+    }
+
+    const ro = new ResizeObserver(resize);
+    ro.observe(canvas);
+    const io = new IntersectionObserver(([e]) => (e.isIntersecting ? start() : stop()));
+    io.observe(section);
+    const onOrientation = () => load();
+    portrait.addEventListener('change', onOrientation);
+
+    resize();
+    updateCopy(progress());
+    load();
+
+    document.addEventListener(
+      'astro:before-swap',
+      () => {
+        stop();
+        loadId++;
+        ro.disconnect();
+        io.disconnect();
+        portrait.removeEventListener('change', onOrientation);
+      },
+      { once: true },
+    );
+  }
+
+  document.addEventListener('astro:page-load', setupDescenso);
+</script>
+
+<style>
+  .descenso {
+    position: relative;
+    height: 300vh;
+    margin-top: -48px;
+    background: var(--bg-dark);
+    color: var(--text-on-dark);
+  }
+  @media (min-width: 735px) {
+    .descenso {
+      height: 400vh;
+    }
+  }
+  .sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+    overflow: hidden;
+  }
+  .poster img,
+  canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  canvas {
+    opacity: 0;
+  }
+  .live canvas {
+    opacity: 1;
+  }
+  .copy {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    padding: calc(48px + 5svh) var(--gutter) max(56px, 9svh);
+    text-align: center;
+    text-shadow: 0 1px 16px rgba(0, 0, 0, 0.55);
+    pointer-events: none;
+  }
+  .copy a {
+    pointer-events: auto;
+    text-shadow: none;
+  }
+  .line {
+    grid-area: 1 / 1;
+    align-self: end;
+    display: grid;
+    justify-items: center;
+    gap: var(--space-element);
+    will-change: opacity, transform;
+  }
+  .line.top {
+    align-self: start;
+  }
+  .line:not(:first-child) {
+    opacity: 0;
+    visibility: hidden;
+  }
+  .line .t-sub {
+    max-width: 30em;
+  }
+  .line .actions {
+    justify-content: center;
+  }
+  .t-secondary {
+    color: var(--text-secondary-on-dark);
+  }
+  .link {
+    color: #ff5a5f;
+  }
+  .hint {
+    position: absolute;
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+    color: var(--text-secondary-on-dark);
+  }
+  /* Sin JS: solo el titular sobre el póster. */
+  :global(.no-js) .line:not(:first-child),
+  :global(.no-js) .hint {
+    display: none;
+  }
+</style>
+

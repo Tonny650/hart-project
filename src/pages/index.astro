@@ -1,0 +1,150 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Descenso from '../components/Descenso.astro';
+import CortesComparativa from '../components/CortesComparativa.astro';
+import FAQ from '../components/FAQ.astro';
+import { faq } from '../data/faq';
+import { site } from '../config/site';
+import { href } from '../lib/paths';
+import { waUrl } from '../lib/whatsapp';
+import personalizados from '../assets/personalizados.webp';
+
+const destacados = (await getCollection('disenos'))
+  .filter((d) => d.data.destacado)
+  .sort((a, b) => a.data.orden - b.data.orden);
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+---
+
+<Base title={site.nombre} description={site.descripcion} jsonLd={[faqLd]} navDark>
+  <link slot="head" rel="preload" as="image" href={href('/descenso/desktop/0001.webp')} media="(min-aspect-ratio: 1/1)" fetchpriority="high" />
+  <link slot="head" rel="preload" as="image" href={href('/descenso/mobile/0001.webp')} media="(max-aspect-ratio: 1/1)" fetchpriority="high" />
+
+  <Descenso />
+
+  <section class="section center intro">
+    <div class="container stack reveal">
+      <h2>Se leen de lejos.<br />Se descubren de cerca.</h2>
+      <p class="t-sub t-secondary measure">Diseños propios, impresos uno por uno en Guadalajara.</p>
+    </div>
+  </section>
+
+  {
+    destacados.map((d, i) => (
+      <section class:list={['section', 'center', 'destacado', { 'section-alt': i % 2 === 0 }]}>
+        <div class="container stack reveal">
+          <h2>{d.data.nombre}</h2>
+          <p class="t-sub t-secondary measure">{d.data.resumen.split('.')[0]}.</p>
+          <div class="actions">
+            <a class="btn" href={href(`/disenos/${d.id}/`)} aria-label={`Pedir ${d.data.nombre}`}>Pedir</a>
+          </div>
+        </div>
+        <div class="container-wide destacado-img reveal">
+          <Image
+            src={d.data.detalle}
+            alt={d.data.detalleAlt}
+            widths={[600, 900, 1200]}
+            sizes="(min-width: 735px) 640px, 100vw"
+            transition:name={`diseno-${d.id}`}
+          />
+        </div>
+      </section>
+    ))
+  }
+
+  <section class="section">
+    <div class="container-wide">
+      <div class="center stack reveal head">
+        <h2>Cuatro cortes.<br />Un precio claro.</h2>
+        <p class="t-sub t-secondary measure">Cualquier diseño, en el corte que prefieras. El precio lo pone la prenda.</p>
+      </div>
+      <div class="reveal">
+        <CortesComparativa />
+      </div>
+      <p class="center more"><a class="link" href={href('/guia-de-tallas/')}>Guía de tallas ›</a></p>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container-wide split">
+      <div class="stack reveal">
+        <h2>Tu idea,<br />en tu prenda.</h2>
+        <p class="t-sub t-secondary">Nos cuentas qué quieres, te mandamos una propuesta y la imprimimos. Desde una pieza.</p>
+        <div class="actions">
+          <a class="link" href={href('/personalizados/')}>Cómo funciona ›</a>
+        </div>
+      </div>
+      <Image
+        class="reveal split-img"
+        src={personalizados}
+        alt="Boceto a lápiz de una katana con flores de cerezo, su impresión a color en película y la playera negra terminada, sobre una mesa gris."
+        widths={[600, 900, 1200, 1600]}
+        sizes="(min-width: 1069px) 60vw, 100vw"
+      />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2 class="reveal faq-title">Preguntas frecuentes.</h2>
+      <FAQ />
+    </div>
+  </section>
+
+  <section class="section section-alt center">
+    <div class="container stack reveal">
+      <h2>Elige tu diseño.</h2>
+      <p class="t-sub t-secondary measure">O escríbenos y lo hacemos juntos.</p>
+      <div class="actions">
+        <a class="btn" href={href('/catalogo/')}>Ver catálogo</a>
+        <a class="link" href={waUrl(`Hola ${site.nombre}. Quiero hacer un pedido.`)} target="_blank" rel="noopener">Escribir por WhatsApp ›</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .destacado .actions {
+    margin-top: var(--space-block);
+  }
+  .destacado-img {
+    margin-top: var(--space-block);
+  }
+  .destacado-img :global(img) {
+    width: min(640px, 100%);
+    margin-inline: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: var(--radius);
+  }
+  .head {
+    margin-bottom: var(--space-block);
+  }
+  .more {
+    margin-top: var(--space-block);
+  }
+  .split {
+    display: grid;
+    gap: var(--space-block);
+    align-items: center;
+  }
+  @media (min-width: 1069px) {
+    .split {
+      grid-template-columns: 2fr 3fr;
+      gap: 64px;
+    }
+  }
+  .split :global(.split-img) {
+    width: 100%;
+    border-radius: var(--radius);
+  }
+  .faq-title {
+    margin-bottom: var(--space-block);
+  }
+</style>

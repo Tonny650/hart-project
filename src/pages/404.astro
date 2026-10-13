@@ -1,0 +1,17 @@
+---
+import Base from '../layouts/Base.astro';
+import { href } from '../lib/paths';
+---
+
+<Base title="Página no encontrada" description="Esta página no existe. Vuelve al catálogo de HART Project.">
+  <section class="section center">
+    <div class="container stack">
+      <h1>Aquí no hay nada.</h1>
+      <p class="t-sub t-secondary">La página que buscas no existe o cambió de lugar.</p>
+      <div class="actions">
+        <a class="btn" href={href('/catalogo/')}>Ver catálogo</a>
+        <a class="link" href={href('/')}>Ir al inicio ›</a>
+      </div>
+    </div>
+  </section>
+</Base>

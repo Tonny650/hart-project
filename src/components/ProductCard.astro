@@ -1,0 +1,52 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import { href } from '../lib/paths';
+import { mxn, precioDesde } from '../config/site';
+
+interface Props {
+  diseno: CollectionEntry<'disenos'>;
+  eager?: boolean;
+}
+const { diseno, eager = false } = Astro.props;
+const { nombre, imagen, imagenAlt, tema } = diseno.data;
+---
+
+<article class="card" data-tema={tema}>
+  <a href={href(`/disenos/${diseno.id}/`)}>
+    <Image
+      src={imagen}
+      alt={imagenAlt}
+      widths={[480, 720, 960, 1280]}
+      sizes="(min-width: 735px) 50vw, 100vw"
+      loading={eager ? 'eager' : 'lazy'}
+      transition:name={`diseno-${diseno.id}`}
+    />
+    <h3>{nombre}</h3>
+    <p class="t-secondary">Desde {mxn(precioDesde)}</p>
+  </a>
+</article>
+
+<style>
+  .card a {
+    display: block;
+  }
+  .card :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: var(--radius);
+    background: var(--bg-alt);
+  }
+  h3 {
+    margin-top: 16px;
+  }
+  p {
+    margin-top: 4px;
+    font-size: var(--fs-body-2);
+  }
+  .card a:hover h3 {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>

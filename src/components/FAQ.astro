@@ -1,0 +1,56 @@
+---
+import { faq } from '../data/faq';
+---
+
+<div class="faq">
+  {
+    faq.map((f) => (
+      <details>
+        <summary>{f.q}</summary>
+        <p>{f.a}</p>
+      </details>
+    ))
+  }
+</div>
+
+<style>
+  .faq {
+    border-top: 1px solid #d2d2d7;
+  }
+  details {
+    border-bottom: 1px solid #d2d2d7;
+  }
+  summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 0;
+    font-size: var(--fs-body);
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary::after {
+    content: '';
+    flex: none;
+    width: 9px;
+    height: 9px;
+    margin-right: 4px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: translateY(-3px) rotate(45deg);
+    transition: transform 300ms var(--ease);
+  }
+  details[open] summary::after {
+    transform: translateY(2px) rotate(-135deg);
+  }
+  details p {
+    max-width: 40em;
+    padding-bottom: 24px;
+    color: var(--text-secondary);
+  }
+</style>

@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.astro/
+.env
+
+# Fotos originales del cliente (incluyen diseños con licencia de terceros): solo locales.
+img/
+# Salidas crudas de Higgsfield, videos y reportes: pesados, solo locales.
+assets-src/

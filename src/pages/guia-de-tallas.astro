@@ -1,0 +1,71 @@
+---
+import Base from '../layouts/Base.astro';
+import { site, tallas } from '../config/site';
+import { waUrl } from '../lib/whatsapp';
+---
+
+<Base
+  title="Guía de tallas"
+  description={`Cómo elegir tu talla en ${site.nombre}: tallas ${tallas.join(', ')} en playera, playera premium, oversize y sudadera.`}
+>
+  <section class="section">
+    <div class="container stack">
+      <h1>Guía de tallas.</h1>
+      <p class="t-sub t-secondary measure">Manejamos {tallas.join(', ')} en todos los cortes. La forma más segura de acertar: compárala con una prenda que ya te quede bien.</p>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container">
+      <h2>Cómo medir.</h2>
+      <dl class="medidas">
+        <div>
+          <dt>Ancho de pecho</dt>
+          <dd>Extiende tu playera sobre una mesa y mide de axila a axila, en línea recta.</dd>
+        </div>
+        <div>
+          <dt>Largo</dt>
+          <dd>Mide desde el punto más alto del hombro, junto al cuello, hasta el borde de abajo.</dd>
+        </div>
+        <div>
+          <dt>Oversize</dt>
+          <dd>Es más ancha y de hombro caído. Si quieres un ajuste holgado, pide tu talla de siempre.</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="section center">
+    <div class="container stack">
+      <h2>¿Dudas con tu talla?</h2>
+      <p class="t-sub t-secondary measure">Mándanos tus medidas y te decimos cuál pedir.</p>
+      <div class="actions">
+        <a class="btn" href={waUrl(`Hola ${site.nombre}. Quiero confirmar mi talla. Mis medidas son: `)} target="_blank" rel="noopener">Preguntar por WhatsApp</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .medidas {
+    margin: var(--space-block) 0 0;
+    border-top: 1px solid var(--border);
+  }
+  .medidas div {
+    display: grid;
+    gap: 4px 32px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  @media (min-width: 735px) {
+    .medidas div {
+      grid-template-columns: 220px 1fr;
+    }
+  }
+  dt {
+    color: var(--text-secondary);
+  }
+  dd {
+    margin: 0;
+  }
+</style>

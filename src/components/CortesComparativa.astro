@@ -1,0 +1,73 @@
+---
+import { Image } from 'astro:assets';
+import { cortes, mxn } from '../config/site';
+import playera from '../assets/cortes/playera.webp';
+import premium from '../assets/cortes/premium.webp';
+import oversize from '../assets/cortes/oversize.webp';
+import sudadera from '../assets/cortes/sudadera.webp';
+
+const fotos = { playera, premium, oversize, sudadera };
+const alts = {
+  playera: 'Playera negra de corte regular, vista de frente.',
+  premium: 'Playera premium color hueso de algodón peinado, vista de frente.',
+  oversize: 'Playera oversize gris jaspe de hombro caído, vista de frente.',
+  sudadera: 'Sudadera negra con capucha y bolsa canguro, vista de frente.',
+};
+---
+
+<div class="grid">
+  {
+    cortes.map((k) => (
+      <article class="corte">
+        <Image src={fotos[k.id]} alt={alts[k.id]} widths={[320, 480, 640]} sizes="(min-width: 1069px) 25vw, 50vw" />
+        <h3>{k.nombre}</h3>
+        <p class="precio">{mxn(k.precio)}</p>
+        <ul class="t-secondary">
+          {k.atributos.map((a) => <li>{a}</li>)}
+        </ul>
+      </article>
+    ))
+  }
+</div>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 48px 16px;
+  }
+  @media (min-width: 1069px) {
+    .grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 32px;
+    }
+  }
+  .corte {
+    text-align: center;
+  }
+  .corte :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: var(--radius);
+  }
+  h3 {
+    margin-top: 20px;
+    font-size: 21px;
+  }
+  .precio {
+    margin-top: 8px;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  ul {
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--fs-body-2);
+  }
+  li + li {
+    margin-top: 6px;
+  }
+</style>

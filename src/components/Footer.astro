@@ -1,0 +1,92 @@
+---
+import { site, cortes, mxn } from '../config/site';
+import { href } from '../lib/paths';
+import { waUrl } from '../lib/whatsapp';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="container-wide">
+    <div class="cols">
+      <div>
+        <h2 class="col-title">Tienda</h2>
+        <ul>
+          <li><a href={href('/catalogo/')}>Catálogo</a></li>
+          <li><a href={href('/personalizados/')}>Diseños personalizados</a></li>
+          <li><a href={href('/guia-de-tallas/')}>Guía de tallas</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="col-title">Precios</h2>
+        <ul>
+          {cortes.map((k) => <li>{k.nombre}: {mxn(k.precio)}</li>)}
+        </ul>
+      </div>
+      <div>
+        <h2 class="col-title">Contacto</h2>
+        <ul>
+          <li><a href={waUrl(`Hola ${site.nombre}.`)} target="_blank" rel="noopener">WhatsApp</a></li>
+          <li><a href={site.redes.instagram} target="_blank" rel="noopener">Instagram</a></li>
+          <li><a href={site.redes.tiktok} target="_blank" rel="noopener">TikTok</a></li>
+          <li>{site.ciudad}, {site.estado}</li>
+        </ul>
+      </div>
+    </div>
+    <div class="legal">
+      <p>Copyright © {year} {site.nombre}. Hecho en México. Precios en pesos mexicanos.</p>
+      <p>
+        by <a href={site.creditos.url} target="_blank" rel="noopener">{site.creditos.nombre}</a>
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--bg-alt);
+    color: var(--text-secondary);
+    font-size: 12px;
+    line-height: 1.33;
+    padding-block: 32px 24px;
+  }
+  .cols {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  @media (min-width: 735px) {
+    .cols {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  .col-title {
+    margin-bottom: 8px;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 1.33;
+  }
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  li + li {
+    margin-top: 8px;
+  }
+  a:hover {
+    color: var(--text);
+    text-decoration: underline;
+  }
+  .legal {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 24px;
+    padding-top: 16px;
+  }
+</style>

@@ -1,0 +1,234 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import { cortes, mxn, site } from '../config/site';
+import { absUrl } from '../lib/paths';
+import { buildPersonalizadoMessage, waUrl } from '../lib/whatsapp';
+import foto from '../assets/personalizados.webp';
+
+const inicial = waUrl(buildPersonalizadoMessage({ corte: 'playera', cantidad: 1 }));
+const pasos = [
+  { t: 'Primero, tu idea.', d: 'Un boceto, una foto, una frase o solo una descripción. Con eso empezamos.' },
+  { t: 'Después, la propuesta.', d: 'Diseñamos y te mandamos cómo se verá en la prenda. Ajustamos hasta que quede.' },
+  { t: 'Al final, la impresión.', d: 'La imprimimos en Guadalajara, en el corte y color que elijas.' },
+];
+
+const ld = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: 'Diseño e impresión de playeras personalizadas',
+    provider: { '@id': absUrl('/#tienda') },
+    areaServed: 'MX',
+    url: absUrl('/personalizados/'),
+  },
+];
+---
+
+<Base
+  title="Diseños personalizados"
+  description={`Playeras, oversize y sudaderas con tu propio diseño. ${site.nombre} lo diseña y lo imprime en Guadalajara, desde una pieza. Cotiza por WhatsApp.`}
+  jsonLd={ld}
+>
+  <section class="section center">
+    <div class="container stack">
+      <h1>Tu idea,<br />en tu prenda.</h1>
+      <p class="t-sub t-secondary measure">Lo diseñamos contigo y lo imprimimos desde una pieza.</p>
+    </div>
+    <div class="container-wide hero-img">
+      <Image
+        src={foto}
+        alt="Boceto a lápiz de una katana con flores de cerezo, su impresión a color en película y la playera negra terminada, sobre una mesa gris."
+        widths={[640, 960, 1280, 1600, 2000]}
+        sizes="(min-width: 1440px) 1440px, 100vw"
+        loading="eager"
+      />
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container">
+      <h2 class="reveal">Así funciona.</h2>
+      <ol class="pasos">
+        {
+          pasos.map((p) => (
+            <li class="reveal">
+              <h3>{p.t}</h3>
+              <p class="t-secondary">{p.d}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container cotiza">
+      <div class="stack">
+        <h2>Cuéntanos.</h2>
+        <p class="t-sub t-secondary">
+          Elige la prenda y escribe tu idea. Se abre WhatsApp con el mensaje listo para enviar.
+        </p>
+        <p class="t-secondary">
+          Precio base por prenda: {cortes.map((k) => `${k.nombre} ${mxn(k.precio)}`).join(', ')}. Te confirmamos el total con la propuesta.
+        </p>
+      </div>
+
+      <form class="form" data-personalizado onsubmit="return false">
+        <fieldset>
+          <legend>Prenda</legend>
+          <div class="cortes">
+            {
+              cortes.map((k, i) => (
+                <label>
+                  <input type="radio" name="corte" value={k.id} checked={i === 0} />
+                  <span>{k.nombre}</span>
+                </label>
+              ))
+            }
+          </div>
+        </fieldset>
+        <label class="campo">
+          <span>Cantidad</span>
+          <input name="cantidad" type="number" inputmode="numeric" min="1" max="500" value="1" />
+        </label>
+        <label class="campo">
+          <span>Tu idea <span class="t-secondary">(opcional)</span></span>
+          <textarea name="idea" rows="4" maxlength="600" placeholder="Por ejemplo: un lobo en línea fina en la espalda, para un regalo."></textarea>
+        </label>
+        <a class="btn" href={inicial} target="_blank" rel="noopener" data-wa>Enviar por WhatsApp</a>
+      </form>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { buildPersonalizadoMessage, waUrl } from '../lib/whatsapp';
+
+  function setup() {
+    const form = document.querySelector<HTMLFormElement>('[data-personalizado]');
+    if (!form || form.dataset.ready) return;
+    form.dataset.ready = '1';
+    const wa = form.querySelector<HTMLAnchorElement>('[data-wa]')!;
+    const update = () => {
+      const data = new FormData(form);
+      wa.href = waUrl(
+        buildPersonalizadoMessage({
+          corte: String(data.get('corte')),
+          cantidad: Math.max(1, Math.round(Number(data.get('cantidad')) || 1)),
+          idea: String(data.get('idea') ?? ''),
+        }),
+      );
+    };
+    form.addEventListener('input', update);
+    form.addEventListener('change', update);
+    update();
+  }
+  document.addEventListener('astro:page-load', setup);
+</script>
+
+<style>
+  .hero-img {
+    margin-top: var(--space-block);
+  }
+  .hero-img :global(img) {
+    width: 100%;
+    border-radius: var(--radius);
+  }
+  .pasos {
+    display: grid;
+    gap: var(--space-block);
+    margin: var(--space-block) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 735px) {
+    .pasos {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+  }
+  .pasos h3 {
+    margin-bottom: 8px;
+  }
+  .cotiza {
+    display: grid;
+    gap: var(--space-block);
+  }
+  @media (min-width: 1069px) {
+    .cotiza {
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+    }
+  }
+  .form {
+    display: grid;
+    gap: 24px;
+    align-content: start;
+  }
+  fieldset {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  legend,
+  .campo > span {
+    margin-bottom: 12px;
+    font-weight: 600;
+    font-size: 17px;
+  }
+  .campo {
+    display: grid;
+  }
+  .campo .t-secondary {
+    font-weight: 400;
+  }
+  .cortes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .cortes input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .cortes span {
+    display: grid;
+    place-items: center;
+    min-height: 48px;
+    padding: 8px;
+    border: 1px solid #d2d2d7;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 15px;
+    text-align: center;
+  }
+  .cortes input:checked + span {
+    border-color: var(--text);
+    box-shadow: inset 0 0 0 1px var(--text);
+  }
+  .cortes input:focus-visible + span {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  input[type='number'],
+  textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #d2d2d7;
+    border-radius: var(--radius);
+    background: #fff;
+    color: var(--text);
+    font: inherit;
+    font-size: 17px;
+  }
+  textarea {
+    resize: vertical;
+  }
+  input[type='number']:focus,
+  textarea:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+</style>

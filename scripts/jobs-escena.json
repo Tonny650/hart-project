@@ -1,0 +1,33 @@
+{
+  "c-playera": {
+    "aspect_ratio": "4:5",
+    "prompt": "High-end e-commerce product photograph of a plain blank black crew-neck cotton t-shirt with a classic regular fit, FRONT view, ghost-mannequin style (invisible mannequin, natural 3D body volume, no person, no hanger), perfectly centered, on a seamless very light grey studio backdrop (#f5f5f7). Soft diffused overhead light, very subtle contact shadow, crisp 180 gsm cotton jersey texture. No print, no logo, no text, no label visible."
+  },
+  "c-premium": {
+    "aspect_ratio": "4:5",
+    "prompt": "High-end e-commerce product photograph of a plain blank bone/off-white (#e8e2d0) premium combed-cotton crew-neck t-shirt, regular fit, slightly heavier 200 gsm fabric with a smooth refined surface, FRONT view, ghost-mannequin style (invisible mannequin, natural 3D body volume, no person, no hanger), perfectly centered, on a seamless very light grey studio backdrop (#f5f5f7). Soft diffused overhead light, very subtle contact shadow. No print, no logo, no text, no label visible."
+  },
+  "c-oversize": {
+    "aspect_ratio": "4:5",
+    "prompt": "High-end e-commerce product photograph of a plain blank heather grey (#b3b3b3) oversized boxy t-shirt with dropped shoulders, wide short sleeves reaching the elbow, longer body and thick ribbed collar, FRONT view, ghost-mannequin style (invisible mannequin, natural 3D body volume, no person, no hanger), perfectly centered, on a seamless very light grey studio backdrop (#f5f5f7). Soft diffused overhead light, very subtle contact shadow. No print, no logo, no text, no label visible."
+  },
+  "c-sudadera": {
+    "aspect_ratio": "4:5",
+    "prompt": "High-end e-commerce product photograph of a plain blank black pullover hoodie with drawstrings, kangaroo pocket and ribbed cuffs, brushed fleece cotton, FRONT view, hood resting down, ghost-mannequin style (invisible mannequin, natural 3D body volume, no person, no hanger), perfectly centered, on a seamless very light grey studio backdrop (#f5f5f7). Soft diffused overhead light, very subtle contact shadow. No print, no logo, no text, no label visible."
+  },
+  "x-personalizados": {
+    "aspect_ratio": "3:2",
+    "images": ["img/WhatsApp Image 2026-09-19 at 3.35.58 AM.jpeg"],
+    "prompt": "Minimal editorial top-down photograph of a clean light grey (#f5f5f7) work surface in a small print studio: on the left a sheet of paper with a loose pencil sketch of a katana with cherry blossoms, in the middle a transparent heat-transfer film with the same design printed in color, on the right the finished black t-shirt neatly folded showing the printed katana with pink cherry blossoms from the reference. Soft natural window light, generous negative space, calm and precise composition, shot like an Apple product page. No hands, no text, no logos, no clutter."
+  },
+  "h-end-16x9": {
+    "aspect_ratio": "16:9",
+    "images": ["assets-src/higgsfield/p-archive-06.png"],
+    "prompt": "Cinematic luxury product photograph on a pure black (#000000) background: the black oversized t-shirt from the reference, BACK view, hanging straight on a slim matte black metal hanger with a curved hook at the top, fully visible and centered, occupying about 75% of the frame height. The large back print from the reference (06 / ARCHIVE gas mask HUD layout in white, grey and red) is reproduced exactly and softly lit by a narrow top light, with a thin cool rim light outlining the shoulders and sleeves. Deep shadows, no floor, no wall, no text other than the print, no reflections. Quiet, precise, Apple-style product film still."
+  },
+  "h-end-9x16": {
+    "aspect_ratio": "9:16",
+    "images": ["assets-src/higgsfield/p-archive-06.png"],
+    "prompt": "Cinematic luxury product photograph on a pure black (#000000) background, vertical frame: the black oversized t-shirt from the reference, BACK view, hanging straight on a slim matte black metal hanger with a curved hook at the top, fully visible and centered, occupying about 65% of the frame height with black space above and below. The large back print from the reference (06 / ARCHIVE gas mask HUD layout in white, grey and red) is reproduced exactly and softly lit by a narrow top light, with a thin cool rim light outlining the shoulders and sleeves. Deep shadows, no floor, no wall, no text other than the print. Quiet, precise, Apple-style product film still."
+  }
+}

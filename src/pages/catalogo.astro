@@ -1,0 +1,125 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import ProductCard from '../components/ProductCard.astro';
+import { absUrl } from '../lib/paths';
+import { mxn, precioDesde, site } from '../config/site';
+
+const disenos = (await getCollection('disenos')).sort((a, b) => a.data.orden - b.data.orden);
+const temas = [
+  { id: 'todos', label: 'Todos' },
+  { id: 'japon', label: 'Japón' },
+  { id: 'cyber', label: 'Cyber' },
+  { id: 'ilustracion', label: 'Ilustración' },
+];
+
+const ld = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: absUrl('/') },
+      { '@type': 'ListItem', position: 2, name: 'Catálogo', item: absUrl('/catalogo/') },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: disenos.map((d, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      url: absUrl(`/disenos/${d.id}/`),
+      name: d.data.nombre,
+    })),
+  },
+];
+---
+
+<Base
+  title="Catálogo"
+  description={`Todos los diseños originales de ${site.nombre}: playeras, oversize y sudaderas desde ${mxn(precioDesde)} MXN. Estética japonesa, cyber e ilustración.`}
+  jsonLd={ld}
+>
+  <section class="section">
+    <div class="container-wide">
+      <header class="head">
+        <h1>Catálogo.</h1>
+        <p class="t-sub t-secondary">Cada diseño, en el corte que elijas. Desde {mxn(precioDesde)}.</p>
+      </header>
+
+      <div class="filtros js-only" role="group" aria-label="Filtrar por tema">
+        {temas.map((t, i) => <button type="button" data-tema={t.id} aria-pressed={i === 0 ? 'true' : 'false'}>{t.label}</button>)}
+      </div>
+
+      <div class="grid" data-grid>
+        {disenos.map((d, i) => <ProductCard diseno={d} eager={i < 2} />)}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  function setupFiltros() {
+    const grid = document.querySelector('[data-grid]');
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.filtros button');
+    if (!grid || !buttons.length) return;
+    buttons.forEach((b) =>
+      b.addEventListener('click', () => {
+        const tema = b.dataset.tema;
+        buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+        grid.querySelectorAll<HTMLElement>('[data-tema]').forEach((card) => {
+          card.hidden = tema !== 'todos' && card.dataset.tema !== tema;
+        });
+      }),
+    );
+  }
+  document.addEventListener('astro:page-load', setupFiltros);
+</script>
+
+<style>
+  .head {
+    display: grid;
+    gap: var(--space-element);
+    margin-bottom: var(--space-block);
+  }
+  .filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: var(--space-block);
+  }
+  :global(.no-js) .js-only {
+    display: none;
+  }
+  .filtros button {
+    min-height: 36px;
+    padding: 6px 18px;
+    border: 1px solid #d2d2d7;
+    border-radius: var(--radius-pill);
+    background: none;
+    color: var(--text);
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 200ms var(--ease), color 200ms var(--ease), border-color 200ms var(--ease);
+  }
+  .filtros button[aria-pressed='true'] {
+    background: var(--text);
+    border-color: var(--text);
+    color: #fff;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 48px 24px;
+  }
+  @media (min-width: 735px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 64px 32px;
+    }
+  }
+  .grid :global([hidden]) {
+    display: none;
+  }
+</style>

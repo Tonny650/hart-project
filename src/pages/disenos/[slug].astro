@@ -1,0 +1,212 @@
+---
+import { Image, getImage } from 'astro:assets';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PedidoForm from '../../components/PedidoForm.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import { absUrl, href } from '../../lib/paths';
+import { cortes, precioDesde, precioHasta, site } from '../../config/site';
+
+export async function getStaticPaths() {
+  const disenos = await getCollection('disenos');
+  return disenos.map((d) => ({ params: { slug: d.id }, props: { diseno: d } }));
+}
+
+interface Props {
+  diseno: CollectionEntry<'disenos'>;
+}
+const { diseno } = Astro.props;
+const { nombre, resumen, imagen, imagenAlt, detalle, detalleAlt, ubicacion, corteSugerido } = diseno.data;
+const { Content } = await render(diseno);
+const url = absUrl(`/disenos/${diseno.id}/`);
+
+const ubicaciones = {
+  frente: 'Impresión al frente.',
+  espalda: 'Impresión en la espalda.',
+  lateral: 'Impresión vertical al frente, del lado del corazón.',
+};
+
+const otros = (await getCollection('disenos'))
+  .filter((d) => d.id !== diseno.id)
+  .sort((a, b) => a.data.orden - b.data.orden)
+  .slice(0, 2);
+
+const ogImg = await getImage({ src: imagen, width: 1200, format: 'jpg' });
+const img1 = await getImage({ src: imagen, width: 1200, format: 'webp' });
+const img2 = await getImage({ src: detalle, width: 1200, format: 'webp' });
+const abs = (p: string) => new URL(p, Astro.site).toString();
+
+const ld = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    '@id': `${url}#producto`,
+    name: nombre,
+    description: resumen,
+    sku: `HART-${diseno.id.toUpperCase()}`,
+    image: [abs(img1.src), abs(img2.src)],
+    brand: { '@type': 'Brand', name: site.nombre },
+    category: 'Ropa > Playeras y sudaderas',
+    offers: {
+      '@type': 'AggregateOffer',
+      priceCurrency: 'MXN',
+      lowPrice: precioDesde,
+      highPrice: precioHasta,
+      offerCount: cortes.length,
+      availability: 'https://schema.org/InStock',
+      url,
+      seller: { '@id': absUrl('/#tienda') },
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: absUrl('/') },
+      { '@type': 'ListItem', position: 2, name: 'Catálogo', item: absUrl('/catalogo/') },
+      { '@type': 'ListItem', position: 3, name: nombre, item: url },
+    ],
+  },
+];
+---
+
+<Base title={nombre} description={resumen} image={abs(ogImg.src)} jsonLd={ld}>
+  <section class="producto">
+    <div class="container-wide layout">
+      <div class="galeria">
+        <Image
+          src={imagen}
+          alt={imagenAlt}
+          widths={[480, 720, 960, 1280, 1600]}
+          sizes="(min-width: 1069px) 55vw, 100vw"
+          loading="eager"
+          fetchpriority="high"
+          transition:name={`diseno-${diseno.id}`}
+        />
+        <Image src={detalle} alt={detalleAlt} widths={[480, 720, 960, 1200]} sizes="(min-width: 1069px) 55vw, 100vw" />
+      </div>
+
+      <div class="panel">
+        <nav class="crumbs t-small t-secondary" aria-label="Ruta">
+          <a href={href('/catalogo/')}>Catálogo</a> › <span aria-current="page">{nombre}</span>
+        </nav>
+        <h1>{nombre}</h1>
+        <div class="desc">
+          <Content />
+          <p class="t-secondary">{ubicaciones[ubicacion]}</p>
+        </div>
+        <PedidoForm diseno={nombre} url={url} corteInicial={corteSugerido} />
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container-wide">
+      <h2 class="otros-title">También te puede gustar.</h2>
+      <div class="otros">
+        {otros.map((d) => <ProductCard diseno={d} />)}
+      </div>
+      <p class="more"><a class="link" href={href('/catalogo/')}>Ver todo el catálogo ›</a></p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .producto {
+    padding-block: 32px var(--space-section);
+  }
+  .layout {
+    display: grid;
+    gap: var(--space-block);
+  }
+  @media (min-width: 1069px) {
+    .layout {
+      grid-template-columns: minmax(0, 1.25fr) minmax(360px, 1fr);
+      gap: 64px;
+      align-items: start;
+    }
+    .panel {
+      position: sticky;
+      top: 64px;
+      gap: 12px;
+      /* Si la pantalla es muy baja, el panel se desplaza por su cuenta sin arrastrar la página. */
+      max-height: calc(100vh - 80px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      /* Aire para que el contorno de foco no se recorte. */
+      padding: 6px;
+      margin: -6px;
+    }
+    h1 {
+      font-size: 40px;
+    }
+    .desc {
+      font-size: 15px;
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+  }
+  .galeria {
+    display: grid;
+    gap: 16px;
+  }
+  .galeria :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: var(--radius);
+    background: var(--bg-alt);
+  }
+  /* En móvil la galería se desliza horizontalmente. */
+  @media (max-width: 1068px) {
+    .galeria {
+      grid-auto-flow: column;
+      grid-auto-columns: 88%;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      margin-inline: calc(var(--gutter) * -1);
+      padding-inline: var(--gutter);
+      scroll-padding-inline: var(--gutter);
+      scrollbar-width: none;
+    }
+    .galeria::-webkit-scrollbar {
+      display: none;
+    }
+    .galeria :global(img) {
+      scroll-snap-align: start;
+    }
+  }
+  .panel {
+    display: grid;
+    gap: var(--space-element);
+  }
+  .crumbs a:hover {
+    color: var(--text);
+  }
+  h1 {
+    font-size: var(--fs-section);
+    line-height: 1.07;
+    letter-spacing: -0.01em;
+  }
+  .desc {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .otros-title {
+    margin-bottom: var(--space-block);
+  }
+  .otros {
+    display: grid;
+    gap: 48px 32px;
+  }
+  @media (min-width: 735px) {
+    .otros {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  .more {
+    margin-top: var(--space-block);
+  }
+</style>

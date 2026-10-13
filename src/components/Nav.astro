@@ -1,0 +1,203 @@
+---
+import Logo from './Logo.astro';
+import { href } from '../lib/paths';
+import { site } from '../config/site';
+import { waUrl } from '../lib/whatsapp';
+
+interface Props {
+  dark?: boolean;
+}
+const { dark = false } = Astro.props;
+const links = [
+  { label: 'Catálogo', path: '/catalogo/' },
+  { label: 'Personalizados', path: '/personalizados/' },
+  { label: 'Guía de tallas', path: '/guia-de-tallas/' },
+];
+const current = Astro.url.pathname;
+---
+
+<header class:list={['nav', { dark }]} transition:persist="nav" data-nav>
+  <nav class="inner container-wide" aria-label="Principal">
+    <a href={href('/')} class="brand" aria-label={`${site.nombre}, inicio`}>
+      <Logo />
+    </a>
+    <button class="toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Abrir menú">
+      <span></span><span></span>
+    </button>
+    <div class="menu" id="nav-menu">
+      <ul>
+        {
+          links.map((l) => (
+            <li>
+              <a href={href(l.path)} aria-current={current.startsWith(href(l.path)) ? 'page' : undefined}>
+                {l.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <a class="btn btn-small" href={waUrl(`Hola ${site.nombre}. Tengo una pregunta.`)} target="_blank" rel="noopener">
+        Pedir
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  function setupNav() {
+    const nav = document.querySelector<HTMLElement>('[data-nav]');
+    const btn = nav?.querySelector<HTMLButtonElement>('.toggle');
+    if (!nav || !btn || btn.dataset.ready) return;
+    btn.dataset.ready = '1';
+    const close = () => {
+      nav.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+      btn.setAttribute('aria-label', 'Abrir menú');
+    };
+    btn.addEventListener('click', () => {
+      const open = nav.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(open));
+      btn.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+    });
+    document.addEventListener('keydown', (e) => e.key === 'Escape' && close());
+    document.addEventListener('astro:after-swap', close);
+  }
+  // El hero oscuro pide la nav en modo oscuro mientras está debajo de ella.
+  function syncTheme() {
+    const nav = document.querySelector<HTMLElement>('[data-nav]');
+    nav?.classList.toggle('dark', !!document.querySelector('[data-nav-dark]'));
+    const hero = document.querySelector('[data-nav-dark]');
+    if (!nav || !hero) return;
+    const io = new IntersectionObserver(([e]) => nav.classList.toggle('dark', e.isIntersecting), {
+      rootMargin: '-48px 0px -100% 0px',
+    });
+    io.observe(hero);
+    document.addEventListener('astro:before-swap', () => io.disconnect(), { once: true });
+  }
+  document.addEventListener('astro:page-load', () => {
+    setupNav();
+    syncTheme();
+  });
+</script>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    color: var(--text);
+    transition: background-color 300ms var(--ease), color 300ms var(--ease);
+  }
+  .nav.dark {
+    background: rgba(0, 0, 0, 0.72);
+    color: var(--text-on-dark);
+  }
+  .inner {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .brand {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+  }
+  .menu {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+  ul {
+    display: flex;
+    gap: 32px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  ul a {
+    font-size: 12px;
+    opacity: 0.88;
+    transition: opacity 200ms var(--ease);
+  }
+  ul a:hover,
+  ul a[aria-current='page'] {
+    opacity: 1;
+  }
+  .toggle {
+    display: none;
+  }
+
+  @media (max-width: 734px) {
+    .toggle {
+      display: grid;
+      place-content: center;
+      gap: 6px;
+      width: 44px;
+      height: 44px;
+      margin-right: -12px;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      cursor: pointer;
+    }
+    .toggle span {
+      display: block;
+      width: 18px;
+      height: 1.5px;
+      background: currentColor;
+      transition: transform 300ms var(--ease);
+    }
+    .open .toggle span:first-child {
+      transform: translateY(3.75px) rotate(45deg);
+    }
+    .open .toggle span:last-child {
+      transform: translateY(-3.75px) rotate(-45deg);
+    }
+    .menu {
+      position: fixed;
+      inset: 48px 0 auto 0;
+      height: calc(100svh - 48px);
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 32px;
+      padding: 24px var(--gutter);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 300ms var(--ease), visibility 300ms;
+    }
+    .nav:not(.dark) .menu {
+      background: var(--bg);
+    }
+    .nav.dark .menu {
+      background: var(--bg-dark);
+    }
+    /* Con el menú abierto la barra también es sólida, para que no se vea el contenido detrás. */
+    .nav.open {
+      background: var(--bg);
+    }
+    .nav.dark.open {
+      background: var(--bg-dark);
+    }
+    .open .menu {
+      opacity: 1;
+      visibility: visible;
+    }
+    ul {
+      flex-direction: column;
+      gap: 8px;
+    }
+    ul a {
+      display: block;
+      padding: 6px 0;
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+  }
+</style>

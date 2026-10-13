@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tonny650.github.io/hart-project/sitemap-index.xml

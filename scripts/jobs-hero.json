@@ -1,0 +1,12 @@
+{
+  "h-start-16x9": {
+    "aspect_ratio": "16:9",
+    "images": ["assets-src/higgsfield/h-end-16x9.png"],
+    "prompt": "Same scene, same lighting and pure black (#000000) background as the reference, but an extreme close-up camera framing on the top of the slim matte black metal hanger: the curved hook is centered in the upper third of the frame, softly rim-lit, the hanger bar and the very top of the black t-shirt collar just entering the bottom edge of the frame. Shallow depth of field, everything else falls into black. No text, no print visible yet. Quiet, precise, Apple-style product film still."
+  },
+  "h-start-9x16": {
+    "aspect_ratio": "9:16",
+    "images": ["assets-src/higgsfield/h-end-9x16.png"],
+    "prompt": "Same scene, same lighting and pure black (#000000) background as the reference, vertical frame, but an extreme close-up camera framing on the top of the slim matte black metal hanger: the curved hook is centered in the upper third of the frame, softly rim-lit, the hanger bar and the very top of the black t-shirt collar just entering the bottom edge of the frame. Shallow depth of field, everything else falls into black. No text, no print visible yet. Quiet, precise, Apple-style product film still."
+  }
+}

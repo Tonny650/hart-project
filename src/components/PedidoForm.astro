@@ -1,0 +1,350 @@
+---
+// Configurador de pedido: corte, color, talla y cantidad → mensaje de WhatsApp.
+import { cortes, tallas, mxn, getCorte, type CorteId } from '../config/site';
+import { buildPedidoMessage, waUrl } from '../lib/whatsapp';
+
+interface Props {
+  diseno: string;
+  url: string;
+  corteInicial: CorteId;
+}
+const { diseno, url, corteInicial } = Astro.props;
+const corte = getCorte(corteInicial);
+const color = corte.colores.find((c) => c.id === 'NEG') ?? corte.colores[0];
+const talla = 'M';
+const inicial = waUrl(buildPedidoMessage({ diseno, corte: corte.id, talla, color: color.nombre, cantidad: 1, url }));
+---
+
+<form class="pedido" data-pedido data-diseno={diseno} data-url={url} onsubmit="return false">
+  <fieldset>
+    <legend>Corte</legend>
+    <div class="cortes">
+      {
+        cortes.map((k) => (
+          <label class="opcion">
+            <input type="radio" name="corte" value={k.id} checked={k.id === corte.id} />
+            <span class="opcion-body">
+              <span class="nombre">{k.nombre}</span>
+              <span class="detalle">{k.atributos[0]}</span>
+              <span class="precio">{mxn(k.precio)}</span>
+            </span>
+          </label>
+        ))
+      }
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>
+      Color <span class="t-secondary" data-color-nombre>{color.nombre}</span>
+    </legend>
+    {
+      cortes.map((k) => (
+        <div class="colores" data-colores={k.id} hidden={k.id !== corte.id}>
+          {k.colores.map((c) => (
+            <label class="swatch" title={c.nombre}>
+              <input
+                type="radio"
+                name={`color-${k.id}`}
+                value={c.nombre}
+                checked={c.id === (k.colores.some((x) => x.id === 'NEG') ? 'NEG' : k.colores[0].id)}
+              />
+              <span style={`--c:${c.hex}`} />
+              <span class="visually-hidden">{c.nombre}</span>
+            </label>
+          ))}
+        </div>
+      ))
+    }
+  </fieldset>
+
+  <fieldset>
+    <legend>Talla</legend>
+    <div class="tallas">
+      {
+        tallas.map((t) => (
+          <label class="talla">
+            <input type="radio" name="talla" value={t} checked={t === talla} />
+            <span>{t}</span>
+          </label>
+        ))
+      }
+    </div>
+  </fieldset>
+
+  <div class="cantidad-row">
+    <label for="cantidad">Cantidad</label>
+    <div class="stepper">
+      <button type="button" data-step="-1" aria-label="Quitar una pieza">−</button>
+      <input id="cantidad" name="cantidad" type="number" inputmode="numeric" min="1" max="20" value="1" />
+      <button type="button" data-step="1" aria-label="Agregar una pieza">+</button>
+    </div>
+  </div>
+
+  <div class="total">
+    <p class="monto" aria-live="polite"><span data-total>{mxn(corte.precio)}</span> <span class="t-secondary moneda">MXN</span></p>
+    <a class="btn btn-wide" href={inicial} target="_blank" rel="noopener" data-wa>Pedir por WhatsApp</a>
+    <p class="t-small t-secondary">Te confirmamos disponibilidad, pago y entrega por WhatsApp.</p>
+  </div>
+</form>
+
+<script>
+  import { cortes, getCorte, mxn } from '../config/site';
+  import { buildPedidoMessage, waUrl } from '../lib/whatsapp';
+
+  function setupPedido() {
+    document.querySelectorAll<HTMLFormElement>('[data-pedido]').forEach((form) => {
+      if (form.dataset.ready) return;
+      form.dataset.ready = '1';
+      const wa = form.querySelector<HTMLAnchorElement>('[data-wa]')!;
+      const total = form.querySelector<HTMLElement>('[data-total]')!;
+      const colorNombre = form.querySelector<HTMLElement>('[data-color-nombre]')!;
+      const cantidad = form.querySelector<HTMLInputElement>('#cantidad')!;
+
+      const value = (name: string) => form.querySelector<HTMLInputElement>(`input[name="${name}"]:checked`)?.value ?? '';
+
+      function update() {
+        const corte = getCorte(value('corte'));
+        for (const k of cortes) {
+          form.querySelector<HTMLElement>(`[data-colores="${k.id}"]`)!.hidden = k.id !== corte.id;
+        }
+        const color = value(`color-${corte.id}`);
+        const n = Math.min(20, Math.max(1, Math.round(+cantidad.value || 1)));
+        if (String(n) !== cantidad.value && document.activeElement !== cantidad) cantidad.value = String(n);
+        colorNombre.textContent = color;
+        total.textContent = mxn(corte.precio * n);
+        wa.href = waUrl(
+          buildPedidoMessage({
+            diseno: form.dataset.diseno!,
+            corte: corte.id,
+            talla: value('talla'),
+            color,
+            cantidad: n,
+            url: form.dataset.url!,
+          }),
+        );
+      }
+
+      form.addEventListener('change', update);
+      cantidad.addEventListener('input', update);
+      cantidad.addEventListener('blur', update);
+      form.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((b) =>
+        b.addEventListener('click', () => {
+          cantidad.value = String(Math.min(20, Math.max(1, (+cantidad.value || 1) + +b.dataset.step!)));
+          update();
+        }),
+      );
+      update();
+    });
+  }
+  document.addEventListener('astro:page-load', setupPedido);
+</script>
+
+<style>
+  .pedido {
+    display: grid;
+    gap: 32px;
+  }
+  fieldset {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+  legend,
+  .cantidad-row > label {
+    margin-bottom: 12px;
+    padding: 0;
+    font-size: 17px;
+    font-weight: 600;
+  }
+  legend .t-secondary {
+    margin-left: 6px;
+    font-weight: 400;
+  }
+  input[type='radio'] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .cortes {
+    display: grid;
+    gap: 12px;
+  }
+  .opcion-body {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2px 16px;
+    padding: 16px 18px;
+    border: 1px solid #d2d2d7;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: border-color 200ms var(--ease);
+  }
+  .nombre {
+    font-weight: 600;
+  }
+  .detalle {
+    grid-column: 1;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+  .precio {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+  }
+  .opcion input:checked + .opcion-body {
+    border-color: var(--text);
+    box-shadow: inset 0 0 0 1px var(--text);
+  }
+  .opcion input:focus-visible + .opcion-body,
+  .swatch input:focus-visible + span,
+  .talla input:focus-visible + span {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .colores {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .colores[hidden] {
+    display: none;
+  }
+  .swatch {
+    position: relative;
+    cursor: pointer;
+  }
+  .swatch span:not(.visually-hidden) {
+    display: block;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--c);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.14);
+  }
+  .swatch input:checked + span {
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.14), 0 0 0 2px #fff, 0 0 0 4px var(--text);
+  }
+
+  .tallas {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+  .talla span {
+    display: grid;
+    place-items: center;
+    min-height: 44px;
+    border: 1px solid #d2d2d7;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 15px;
+  }
+  .talla input:checked + span {
+    border-color: var(--text);
+    box-shadow: inset 0 0 0 1px var(--text);
+  }
+
+  .cantidad-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .cantidad-row > label {
+    margin: 0;
+  }
+  .stepper {
+    display: flex;
+    align-items: center;
+    border: 1px solid #d2d2d7;
+    border-radius: var(--radius-pill);
+  }
+  .stepper button {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: none;
+    color: var(--text);
+    font-size: 20px;
+    cursor: pointer;
+  }
+  .stepper input {
+    width: 44px;
+    border: 0;
+    background: none;
+    font: inherit;
+    text-align: center;
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  .stepper input::-webkit-inner-spin-button,
+  .stepper input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .total {
+    display: grid;
+    gap: 16px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+  .monto {
+    font-size: 40px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+  .moneda {
+    font-size: 17px;
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+  .btn-wide {
+    width: 100%;
+  }
+
+  /* Escritorio: panel compacto para que todo el pedido quepa en una pantalla. */
+  @media (min-width: 1069px) {
+    .pedido {
+      gap: 22px;
+    }
+    legend,
+    .cantidad-row > label {
+      margin-bottom: 10px;
+    }
+    .cortes {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .opcion-body {
+      padding: 10px 14px;
+      gap: 0 8px;
+    }
+    .detalle {
+      grid-column: 1 / -1;
+      font-size: 13px;
+    }
+    .precio {
+      grid-row: 1;
+      font-weight: 600;
+    }
+    .total {
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 8px 24px;
+      padding-top: 18px;
+    }
+    .total .t-small {
+      grid-column: 1 / -1;
+    }
+    .monto {
+      font-size: 28px;
+      white-space: nowrap;
+    }
+  }
+</style>
