@@ -1,0 +1,123 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../config/site';
+import { absUrl, href } from '../lib/paths';
+
+const ld = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: `Configurador 3D de ${site.nombre}`,
+    applicationCategory: 'DesignApplication',
+    operatingSystem: 'Web',
+    url: absUrl('/disena/'),
+    provider: { '@id': absUrl('/#tienda') },
+    offers: { '@type': 'Offer', priceCurrency: 'MXN', availability: 'https://schema.org/InStock' },
+  },
+];
+---
+
+<Base
+  title="Diseña tu prenda"
+  description={`Elige corte, color y diseño, colócalo en frente y espalda y míralo en 3D. Manda tu pedido a ${site.nombre} por WhatsApp.`}
+  jsonLd={ld}
+>
+  <section class="section intro">
+    <div class="container-wide stack">
+      <h1>Diseña tu prenda.</h1>
+      <p class="t-sub t-secondary measure">Elige el corte, el color y tu diseño. Gíralo en 3D y mándanos el pedido por WhatsApp.</p>
+    </div>
+  </section>
+
+  <section class="container-wide config">
+    <div class="host" data-configurador>
+      <div class="cargando">
+        <p data-estado>Configurador 3D</p>
+        <button class="btn" type="button">Empezar a diseñar</button>
+      </div>
+    </div>
+    <noscript><p class="t-secondary">El configurador necesita JavaScript. También puedes <a class="link" href={href('/personalizados/')}>cotizar por WhatsApp</a>.</p></noscript>
+  </section>
+
+  <section class="section section-alt center">
+    <div class="container stack reveal">
+      <h2>¿Algo más elaborado?</h2>
+      <p class="t-sub t-secondary measure">Si tu idea aún no es una imagen, la diseñamos contigo.</p>
+      <div class="actions">
+        <a class="link" href={href('/personalizados/')}>Diseños personalizados ›</a>
+        <a class="link" href={href('/guia-de-tallas/')}>Guía de tallas ›</a>
+      </div>
+    </div>
+  </section>
+
+  <p class="container-wide creditos t-small t-secondary">
+    Modelo 3D «hoodie» de <a href="https://sketchfab.com/3d-models/hoodie-5ffe31a324a6452c8c4ada71daa12da9" rel="noopener" target="_blank">pokoponmaru</a> (CC BY 4.0).
+    Modelo 3D «T-SHIRT 3D Model Free» de <a href="https://sketchfab.com/3d-models/t-shirt-3d-model-free-408000a9975a4c34866b42dfaca4fa75" rel="noopener" target="_blank">Mohammad Rajabloo</a> (CC BY 4.0).
+    La previsualización es aproximada; te confirmamos tamaño y colores antes de imprimir.
+  </p>
+</Base>
+
+<script>
+  // Fachada: three.js se descarga con la primera interacción (tocar, desplazar, mover el cursor, teclado).
+  const EVENTOS = ['pointerdown', 'pointermove', 'touchstart', 'keydown', 'wheel', 'scroll'] as const;
+
+  function setup() {
+    const host = document.querySelector<HTMLElement>('[data-configurador]');
+    if (!host || host.dataset.ready) return;
+    host.dataset.ready = '1';
+    let desmontar: (() => void) | undefined;
+    let iniciado = false;
+    const quitar = () => EVENTOS.forEach((e) => removeEventListener(e, cargar, true));
+    async function cargar() {
+      if (iniciado) return;
+      iniciado = true;
+      quitar();
+      const estado = host!.querySelector('[data-estado]');
+      if (estado) estado.textContent = 'Cargando configurador…';
+      const { montar } = await import('../components/configurador/montar');
+      if (!host!.isConnected) return;
+      host!.replaceChildren();
+      desmontar = montar(host!);
+    }
+    EVENTOS.forEach((e) => addEventListener(e, cargar, { capture: true, passive: true }));
+    document.addEventListener(
+      'astro:before-swap',
+      () => {
+        quitar();
+        desmontar?.();
+      },
+      { once: true },
+    );
+  }
+  document.addEventListener('astro:page-load', setup);
+</script>
+
+<style>
+  .intro {
+    padding-bottom: var(--space-block);
+  }
+  .config {
+    padding-bottom: var(--space-section);
+  }
+  .host {
+    min-height: calc(100svh - 80px);
+  }
+  .cargando {
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 16px;
+    height: calc(100svh - 80px);
+    min-height: 440px;
+    max-height: 860px;
+    border-radius: 18px;
+    background: var(--bg-alt);
+    color: var(--text-secondary);
+  }
+  .creditos {
+    padding-block: 24px;
+  }
+  .creditos a {
+    text-decoration: underline;
+  }
+</style>

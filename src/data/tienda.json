@@ -1,0 +1,301 @@
+{
+  "cortes": [
+    {
+      "id": "playera",
+      "nombre": "Playera",
+      "precio": 220,
+      "atributos": [
+        "Algodón 180 g",
+        "Corte regular",
+        "36 colores"
+      ],
+      "colores": [
+        "BLA",
+        "MAR",
+        "NEG",
+        "REY",
+        "ROJ",
+        "CAN",
+        "CHA",
+        "CHE",
+        "HEL",
+        "KAK",
+        "OXF",
+        "PET",
+        "PEY",
+        "TUR",
+        "AQU",
+        "BAN",
+        "CEL",
+        "FLA",
+        "LIM",
+        "MEN",
+        "MIL",
+        "MOR",
+        "NNE",
+        "RNE",
+        "ROS",
+        "SAL",
+        "TAB",
+        "VNE",
+        "JAS",
+        "VIN",
+        "HUE",
+        "PER",
+        "BOT",
+        "NAN",
+        "MON",
+        "AMA"
+      ]
+    },
+    {
+      "id": "premium",
+      "nombre": "Playera premium",
+      "precio": 250,
+      "atributos": [
+        "Algodón peinado 200 g",
+        "Tacto más suave",
+        "6 colores"
+      ],
+      "colores": [
+        "BLA",
+        "MAR",
+        "NEG",
+        "JAS",
+        "HUE",
+        "CRU"
+      ]
+    },
+    {
+      "id": "oversize",
+      "nombre": "Oversize",
+      "precio": 320,
+      "atributos": [
+        "Corte holgado",
+        "Hombro caído",
+        "6 colores"
+      ],
+      "colores": [
+        "BLA",
+        "MAR",
+        "NEG",
+        "JAS",
+        "HUE",
+        "CIE"
+      ]
+    },
+    {
+      "id": "sudadera",
+      "nombre": "Sudadera",
+      "precio": 430,
+      "atributos": [
+        "Con capucha",
+        "Bolsa canguro",
+        "Interior afelpado"
+      ],
+      "colores": [
+        "NEG",
+        "HUE"
+      ]
+    }
+  ],
+  "colores": [
+    {
+      "id": "BLA",
+      "nombre": "Blanco",
+      "hex": "#ffffff"
+    },
+    {
+      "id": "MAR",
+      "nombre": "Marino",
+      "hex": "#1b2030"
+    },
+    {
+      "id": "NEG",
+      "nombre": "Negro",
+      "hex": "#000000"
+    },
+    {
+      "id": "REY",
+      "nombre": "Azul rey",
+      "hex": "#0d47a1"
+    },
+    {
+      "id": "ROJ",
+      "nombre": "Rojo",
+      "hex": "#e00016"
+    },
+    {
+      "id": "CAN",
+      "nombre": "Canario",
+      "hex": "#edd040"
+    },
+    {
+      "id": "CHA",
+      "nombre": "Charcoal",
+      "hex": "#36363b"
+    },
+    {
+      "id": "CHE",
+      "nombre": "Cereza",
+      "hex": "#800020"
+    },
+    {
+      "id": "HEL",
+      "nombre": "Rosa helio",
+      "hex": "#e0337a"
+    },
+    {
+      "id": "KAK",
+      "nombre": "Kaki",
+      "hex": "#b9a886"
+    },
+    {
+      "id": "OXF",
+      "nombre": "Oxford",
+      "hex": "#353535"
+    },
+    {
+      "id": "PET",
+      "nombre": "Petróleo",
+      "hex": "#213b4b"
+    },
+    {
+      "id": "PEY",
+      "nombre": "Turquesa oscuro",
+      "hex": "#00a3b4"
+    },
+    {
+      "id": "TUR",
+      "nombre": "Turquesa",
+      "hex": "#0a83b8"
+    },
+    {
+      "id": "AQU",
+      "nombre": "Aqua",
+      "hex": "#66d9e3"
+    },
+    {
+      "id": "BAN",
+      "nombre": "Verde bandera",
+      "hex": "#054d1c"
+    },
+    {
+      "id": "CEL",
+      "nombre": "Celeste",
+      "hex": "#577fd6"
+    },
+    {
+      "id": "FLA",
+      "nombre": "Amarillo flúor",
+      "hex": "#d9f52a"
+    },
+    {
+      "id": "LIM",
+      "nombre": "Limón",
+      "hex": "#91dd27"
+    },
+    {
+      "id": "MEN",
+      "nombre": "Menta",
+      "hex": "#8fe8dc"
+    },
+    {
+      "id": "MIL",
+      "nombre": "Verde militar",
+      "hex": "#3a3a2b"
+    },
+    {
+      "id": "MOR",
+      "nombre": "Morado",
+      "hex": "#3b2c5a"
+    },
+    {
+      "id": "NNE",
+      "nombre": "Naranja neón",
+      "hex": "#f39203"
+    },
+    {
+      "id": "RNE",
+      "nombre": "Rosa neón",
+      "hex": "#ff4f73"
+    },
+    {
+      "id": "ROS",
+      "nombre": "Rosa",
+      "hex": "#f7dfee"
+    },
+    {
+      "id": "SAL",
+      "nombre": "Salmón",
+      "hex": "#d05559"
+    },
+    {
+      "id": "TAB",
+      "nombre": "Tabaco",
+      "hex": "#2c1c1b"
+    },
+    {
+      "id": "VNE",
+      "nombre": "Verde neón",
+      "hex": "#7ef05b"
+    },
+    {
+      "id": "JAS",
+      "nombre": "Jaspe",
+      "hex": "#b3b3b3"
+    },
+    {
+      "id": "VIN",
+      "nombre": "Vino",
+      "hex": "#560008"
+    },
+    {
+      "id": "HUE",
+      "nombre": "Hueso",
+      "hex": "#e8e2d0"
+    },
+    {
+      "id": "PER",
+      "nombre": "Perla",
+      "hex": "#d8d8dd"
+    },
+    {
+      "id": "BOT",
+      "nombre": "Verde botella",
+      "hex": "#193f35"
+    },
+    {
+      "id": "NAN",
+      "nombre": "Naranja",
+      "hex": "#ff5426"
+    },
+    {
+      "id": "MON",
+      "nombre": "Morado noche",
+      "hex": "#392d58"
+    },
+    {
+      "id": "AMA",
+      "nombre": "Amarillo",
+      "hex": "#ffd84f"
+    },
+    {
+      "id": "CRU",
+      "nombre": "Crudo",
+      "hex": "#fbf6e6"
+    },
+    {
+      "id": "CIE",
+      "nombre": "Cielo",
+      "hex": "#b3c8dc"
+    }
+  ],
+  "tallas": [
+    "CH",
+    "M",
+    "G",
+    "XG",
+    "XXG"
+  ]
+}

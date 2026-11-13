@@ -7,3 +7,6 @@ dist/
 img/
 # Salidas crudas de Higgsfield, videos y reportes: pesados, solo locales.
 assets-src/
+
+# hoja inicial generada (npm run hoja:plantilla)
+hoja-hart.xlsx

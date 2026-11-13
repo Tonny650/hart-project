@@ -53,3 +53,29 @@ Formato: `[ ]` pendiente · `[x]` hecha · `[P]` paralelizable · (HU) historia 
 - [ ] T081 Confirmar nombres de colores con códigos dudosos (CHA, CHE, HEL, PEY, FLA, MON) en `site.ts`
 - [ ] T082 Colores de sudadera (hoy: Negro y Hueso)
 - [ ] T083 Dominio propio: variables `SITE_URL` y `BASE_PATH=/`, `public/CNAME`, `robots.txt`
+
+## Fase 9 — Configurador 3D (`/disena/`)
+Integra el prototipo validado en `otro/test`. Criterios de aceptación:
+- Elegir corte (los 4 de `site.ts`, con su precio), talla (`tallas`) y color (colores de ese corte).
+- Colocar un diseño de muestra o uno subido por el cliente en frente y espalda, en cm reales, con aviso de DPI bajo.
+- Vista 3D girable; playera/premium/oversize usan el modelo de playera, sudadera el de sudadera.
+- "Enviar por WhatsApp" manda corte, precio, talla, color, cantidad, zonas y URL + ficha con frente y espalda.
+- Estética del sitio (claro, rojo solo en lo accionable); funciona a 375 px; créditos CC BY de los modelos.
+- Diseños con licencia solo dentro de la herramienta (excepción §III).
+
+- [x] T090 Dependencias React + three.js, integración `@astrojs/react`
+- [x] T091 Modelos y diseños en `public/configurador/` (WebP)
+- [x] T092 `src/components/configurador/*` adaptado a `site.ts` y al base path
+- [x] T093 `buildConfiguradoMessage` + pruebas
+- [x] T094 Página `/disena/`, enlaces en nav, footer y personalizados
+- [x] T095 QA en navegador 390 y 1440 px; Lighthouse móvil `/disena/`: 100 / 100 / 100 / 100 (three.js se carga con la primera interacción)
+
+## Fase 10 — Datos editables desde Google Sheets (`docs/hoja-de-google.md`)
+Criterios de aceptación: el dueño, sin GitHub y desde el teléfono, edita precios/cortes, colores/tallas, diseños del configurador y catálogo; una casilla publica en ~2 min; un error de la hoja no publica nada y se explica en la hoja; el sitio sigue estático (Lighthouse sin cambios).
+
+- [x] T100 `src/data/tienda.json` y `configurador.json`; `site.ts` y el configurador los leen
+- [x] T101 `scripts/hoja/validar.mjs` + pruebas; `scripts/sync-hoja.mjs` (Drive → WebP, borra lo retirado)
+- [x] T102 `scripts/plantilla-hoja.mjs`: hoja inicial con los datos actuales (ida y vuelta sin cambios)
+- [x] T103 Workflow: sync + commit + deploy; `repository_dispatch` y respaldo diario
+- [x] T104 `scripts/google/publicar.gs`: casilla Publicar con estado y errores en la hoja
+- [ ] T105 Instalación real: hoja, carpeta de Drive, `SHEET_ID`, token, Apps Script (requiere cuentas del cliente)
