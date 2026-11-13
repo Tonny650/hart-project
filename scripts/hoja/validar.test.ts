@@ -80,7 +80,8 @@ describe('validarHoja', () => {
 
   it('ignora filas vacías e inactivas, y exige los cuatro cortes', () => {
     const h = base();
-    h.catalogo.push(fila(3, { nombre: '', tema: '' }), fila(4, { nombre: 'Viejo', activo: false }));
+    h.catalogo.push(fila(3, { nombre: '', tema: '' }), fila(4, { nombre: 'Viejo', activo: false }), fila(5, { destacado: false, activo: false }));
+    h.colores.push(fila(9, { playera: false, premium: 'FALSE', oversize: false, sudadera: false }));
     h.cortes.pop();
     const { errores, catalogo } = validarHoja(h);
     expect(catalogo).toHaveLength(1);

@@ -76,8 +76,8 @@ export function validarHoja(hoja) {
       err(PESTANAS[clave], 0, 'no existe. Revisa que la pestaña se llame exactamente así.');
       return [];
     }
-    // ignora filas totalmente vacías
-    return f.filter((r) => Object.entries(r).some(([k, v]) => k !== '_fila' && texto(v) !== ''));
+    // ignora filas vacías; una fila que solo tiene casillas sin marcar también cuenta como vacía
+    return f.filter((r) => Object.entries(r).some(([k, v]) => k !== '_fila' && v !== false && texto(v) !== '' && normalizar(v) !== 'false'));
   };
 
   // ---------- tallas ----------
