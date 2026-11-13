@@ -10,12 +10,13 @@ Toda imagen de producto (generada o retocada) debe reproducir el diseño impreso
 
 ## III. Solo diseños propios
 El catálogo público contiene únicamente diseños originales de HART Project. Personajes, logotipos o marcas de terceros no aparecen en imágenes, textos, metadatos ni URLs. Los pedidos de ese tipo se atienden por WhatsApp como "pedido personalizado".
+**Única excepción:** los diseños de muestra que trae el configurador 3D (`/disena/`) pueden incluir personajes de terceros, solo dentro de la herramienta; no se nombran en textos, metadatos, `alt` ni URLs de ninguna página.
 
 ## IV. WhatsApp es el checkout
 No hay carrito, pagos ni backend. Cada acción de compra termina en un enlace `wa.me` con un mensaje prellenado que incluye diseño, corte, precio, talla, color, cantidad y URL del producto. El mensaje es la orden: debe ser completo y legible.
 
 ## V. Una sola fuente de verdad
-Precios, cortes, tallas, colores, número de WhatsApp y dominio viven en `src/config/site.ts`. Los diseños viven en la colección de contenido `disenos`. Ningún precio se escribe a mano en una página.
+Precios, cortes, tallas, colores, diseños del configurador y el catálogo se editan en la **hoja de Google** de la tienda; `scripts/sync-hoja.mjs` los valida y los copia al repositorio (`src/data/*.json`, colección `disenos`), que es lo único que leen las páginas (ver `docs/hoja-de-google.md`). Número de WhatsApp y dominio viven en `src/config/site.ts`. Ningún precio se escribe a mano en una página.
 
 ## VI. Estático, rápido y encontrable
 Sitio estático (Astro) sin JS salvo donde una interacción lo exige. HTML semántico, un `h1` por página, `lang="es-MX"`, metadatos y JSON-LD por página. Objetivos Lighthouse móvil: Performance ≥ 90; SEO, Accesibilidad y Buenas prácticas ≥ 95.

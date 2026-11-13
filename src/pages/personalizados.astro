@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import { cortes, mxn, site } from '../config/site';
-import { absUrl } from '../lib/paths';
+import { absUrl, href } from '../lib/paths';
 import { buildPersonalizadoMessage, waUrl } from '../lib/whatsapp';
 import foto from '../assets/personalizados.webp';
 
@@ -34,6 +34,7 @@ const ld = [
     <div class="container stack">
       <h1>Tu idea,<br />en tu prenda.</h1>
       <p class="t-sub t-secondary measure">Lo diseñamos contigo y lo imprimimos desde una pieza.</p>
+      <p><a class="link" href={href('/disena/')}>¿Ya tienes tu imagen? Pruébala en 3D ›</a></p>
     </div>
     <div class="container-wide hero-img">
       <Image

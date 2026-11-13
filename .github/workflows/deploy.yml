@@ -1,12 +1,20 @@
 name: Deploy to GitHub Pages
+# El id que manda la hoja de Google va en el título para que su script encuentre esta ejecución.
+run-name: ${{ github.event.client_payload.id && format('Publicar desde la hoja {0}', github.event.client_payload.id) || github.event.head_commit.message || github.workflow }}
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
+  # casilla "Publicar cambios" de la hoja (scripts/google/publicar.gs)
+  repository_dispatch:
+    types: [publicar]
+  # respaldo diario, 6:00 en Guadalajara
+  schedule:
+    - cron: '0 12 * * *'
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -24,6 +32,22 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # Datos de la hoja de Google (variable SHEET_ID en Settings → Variables). Sin la variable, se usan los del repositorio.
+      - name: Traer datos de la hoja
+        if: vars.SHEET_ID != ''
+        run: node scripts/sync-hoja.mjs
+        env:
+          SHEET_ID: ${{ vars.SHEET_ID }}
+      - name: Guardar los datos en el repositorio
+        if: vars.SHEET_ID != ''
+        run: |
+          git add -A src/data src/content/disenos src/assets/disenos public/configurador
+          if git diff --cached --quiet; then echo "Sin cambios en la hoja"; exit 0; fi
+          git config user.name "HART Project (hoja)"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Datos desde la hoja de Google"
+          git pull --rebase
+          git push
       - run: npm test
       - run: npm run build
         env:

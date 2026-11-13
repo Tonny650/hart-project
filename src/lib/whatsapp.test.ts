@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildPedidoMessage, buildPersonalizadoMessage, waUrl } from './whatsapp';
+import { buildConfiguradoMessage, buildPedidoMessage, buildPersonalizadoMessage, waUrl } from './whatsapp';
 
 describe('buildPedidoMessage', () => {
   it('arma el pedido de una pieza sin total', () => {
@@ -34,6 +34,34 @@ describe('buildPersonalizadoMessage', () => {
   });
   it('incluye la idea', () => {
     expect(buildPersonalizadoMessage({ corte: 'premium', cantidad: 1, idea: 'Un lobo' })).toContain('Idea: Un lobo');
+  });
+});
+
+describe('buildConfiguradoMessage', () => {
+  it('lista prenda, talla, color y cada zona', () => {
+    expect(
+      buildConfiguradoMessage({
+        corte: 'sudadera', talla: 'M', color: 'Negro', cantidad: 1,
+        zonas: ['Frente: Koi · 9 × 9 cm', 'Espalda: sin diseño'], url: 'https://example.com/disena/',
+      }),
+    ).toBe(
+      [
+        'Hola HART Project. Quiero pedir esta prenda que armé en el configurador:',
+        '',
+        '• Sudadera ($430) — Talla M — Negro — 1 pieza.',
+        '• Frente: Koi · 9 × 9 cm',
+        '• Espalda: sin diseño',
+        '',
+        'Adjunto la previsualización.',
+        'https://example.com/disena/',
+      ].join('\n'),
+    );
+  });
+
+  it('incluye el total cuando hay más de una pieza', () => {
+    expect(
+      buildConfiguradoMessage({ corte: 'playera', talla: 'G', color: 'Blanco', cantidad: 2, zonas: [], url: 'u' }),
+    ).toContain('2 piezas. Total: $440.');
   });
 });
 

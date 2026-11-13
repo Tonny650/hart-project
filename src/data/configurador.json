@@ -1,0 +1,59 @@
+{
+  "disenos": [
+    {
+      "id": "hart-logo-negro",
+      "nombre": "HART negro",
+      "soloOscuras": false
+    },
+    {
+      "id": "hart-logo-blanco",
+      "nombre": "HART blanco",
+      "soloOscuras": false
+    },
+    {
+      "id": "koi",
+      "nombre": "Koi",
+      "soloOscuras": false
+    },
+    {
+      "id": "gran-ola",
+      "nombre": "Gran ola",
+      "soloOscuras": false
+    },
+    {
+      "id": "grulla",
+      "nombre": "Grulla",
+      "soloOscuras": false
+    },
+    {
+      "id": "oni-hannya",
+      "nombre": "Oni hannya",
+      "soloOscuras": false
+    },
+    {
+      "id": "katana-sakura",
+      "nombre": "Katana sakura",
+      "soloOscuras": false
+    },
+    {
+      "id": "spider-red",
+      "nombre": "Spider rojo",
+      "soloOscuras": true
+    },
+    {
+      "id": "spider-grunge",
+      "nombre": "Spider grunge",
+      "soloOscuras": true
+    },
+    {
+      "id": "deadpool-x",
+      "nombre": "Deadpool X",
+      "soloOscuras": true
+    },
+    {
+      "id": "deadpool-logo",
+      "nombre": "Deadpool logo",
+      "soloOscuras": true
+    }
+  ]
+}

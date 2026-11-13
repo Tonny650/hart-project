@@ -8,14 +8,26 @@
     "build": "astro build",
     "preview": "astro preview",
     "test": "vitest run",
-    "frames": "node scripts/extract-frames.mjs"
+    "frames": "node scripts/extract-frames.mjs",
+    "hoja:sync": "node scripts/sync-hoja.mjs",
+    "hoja:plantilla": "node scripts/plantilla-hoja.mjs"
   },
   "dependencies": {
+    "@astrojs/react": "^4.4.2",
     "@astrojs/sitemap": "^3.7.4",
     "@fontsource-variable/inter": "^5.3.0",
-    "astro": "^5.18.2"
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.2",
+    "astro": "^5.18.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "three": "^0.186.1"
   },
   "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/three": "^0.186.0",
+    "exceljs": "^4.4.0",
     "ffmpeg-static": "^5.3.0",
     "sharp": "^0.35.5",
     "vitest": "^5.0.4"
